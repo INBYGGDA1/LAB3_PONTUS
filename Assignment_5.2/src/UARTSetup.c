@@ -25,6 +25,7 @@
 #include "utils/uartstdio.h"
 
 volatile struct tm userInputTime;
+volatile uint32_t default_flag = 0;
 
 uint32_t UARTCheckInput(const char *input) {
   uint32_t hours, minutes, seconds;
@@ -45,15 +46,21 @@ uint32_t UARTCheckInput(const char *input) {
     userInputTime.tm_min = minutes;
     userInputTime.tm_hour = hours;
     userInputTime.tm_sec = seconds;
-    return 1;
   }
   if (strcmp(input, "stop") == 1) {
     return 2;
   } else if (strcmp(input, "start") == 1) {
-    return 3;
+    return 1;
 
   } else if (strcmp(input, "reset") == 1) {
-    return 4;
+    if (default_flag == 1) {
+      userInputTime.tm_sec = 0;
+      userInputTime.tm_hour = 0;
+      userInputTime.tm_min = 0;
+    } else {
+      // Set reset to user input
+    }
+    return 3;
   }
 
   return 1; // Input is in "hh:mm:ss" format and valid
@@ -86,23 +93,10 @@ void UARTConfigure() {
 }
 
 /*================================================================*/
-/*            Print a string to the serial terminal               */
-/*================================================================*/
-void UARTPrintToTerminal(char *buf) {
-  // Prints the string in buf to the terminal
-  UARTprintf(buf);
-}
-
-/*================================================================*/
 /*            Wait for input in the serial terminal               */
 /*================================================================*/
 void UARTReceiveInput(char *buf) {
   // Input is in hh:mm:ss, convert this string and place in the time struct
   struct tm time_info;
   UARTgets(buf, sizeof(buf));
-  // If inpute is correct
-  if (UARTCheckInput(buf) == 1) {
-  }
-
-  // implement error checking so that input is in the correct format
 }

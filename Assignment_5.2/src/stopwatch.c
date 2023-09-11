@@ -19,20 +19,22 @@
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
+#include "utils/uartstdio.h"
 
 volatile uint32_t seconds = 0; // Variable to maintain elapsed seconds
 /*================================================================*/
 /*         Functions to start,stop, and reset the stopwatch       */
 /*================================================================*/
-void STOPWATCHStart(char* userInput) {}
-void STOPWATCHStop(char* userInput) {}
-void STOPWATCHReset(char* userInput) {}
+void STOPWATCHStart(char *userInput) {}
+void STOPWATCHStop() {}
+void STOPWATCHReset(char *userInput) {}
 /*================================================================*/
 /*         The stopwatch will count using an IRS                  */
 /*================================================================*/
 void *IntHandler() {
   // This irs should be called every 1 second and increment the time
   seconds++;
+  UARTprintf("time: %d\n", seconds);
   // Clear the interrupt flag
   TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 }
