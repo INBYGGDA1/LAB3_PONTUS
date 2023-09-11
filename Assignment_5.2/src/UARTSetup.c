@@ -15,6 +15,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
+#include <stdio.h>
+#include <string.h>
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
@@ -22,6 +24,40 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
+volatile struct tm userInputTime;
+
+uint32_t UARTCheckInput(const char *input) {
+  uint32_t hours, minutes, seconds;
+  char format[4]; // To store the ":" separators
+
+  // Attempt to parse the input string
+  if (sscanf(input, "%2d:%2d:%2d%3s", &hours, &minutes, &seconds, format) !=
+      3) {
+    return 0; // Parsing failed, invalid format
+  }
+
+  // Check that hours, minutes, and seconds are within valid ranges
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59 || seconds < 0 ||
+      seconds > 59) {
+    return 0; // Components out of range, invalid format
+  } else {
+    // Save the input to the struct
+    userInputTime.tm_min = minutes;
+    userInputTime.tm_hour = hours;
+    userInputTime.tm_sec = seconds;
+    return 1;
+  }
+  if (strcmp(input, "stop") == 1) {
+    return 2;
+  } else if (strcmp(input, "start") == 1) {
+    return 3;
+
+  } else if (strcmp(input, "reset") == 1) {
+    return 4;
+  }
+
+  return 1; // Input is in "hh:mm:ss" format and valid
+}
 /*================================================================*/
 /*            Initialize the UART communication                   */
 /*================================================================*/
@@ -64,4 +100,9 @@ void UARTReceiveInput(char *buf) {
   // Input is in hh:mm:ss, convert this string and place in the time struct
   struct tm time_info;
   UARTgets(buf, sizeof(buf));
+  // If inpute is correct
+  if (UARTCheckInput(buf) == 1) {
+  }
+
+  // implement error checking so that input is in the correct format
 }
