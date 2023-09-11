@@ -24,9 +24,9 @@ volatile uint32_t seconds = 0; // Variable to maintain elapsed seconds
 /*================================================================*/
 /*         Functions to start,stop, and reset the stopwatch       */
 /*================================================================*/
-void STOPWATCHStart() {}
-void STOPWATCHStop() {}
-void STOPWATCHReset() {}
+void STOPWATCHStart(char* userInput) {}
+void STOPWATCHStop(char* userInput) {}
+void STOPWATCHReset(char* userInput) {}
 /*================================================================*/
 /*         The stopwatch will count using an IRS                  */
 /*================================================================*/
