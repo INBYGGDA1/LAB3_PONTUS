@@ -18,6 +18,7 @@
 /*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include "inc/stopwatch.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
@@ -27,24 +28,35 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
+#include "utils/uartstdio.c"
 // #include "inc/tm4c129encpdt.h"
 #include "inc/UARTSetup.h"
+#include "inc/stopwatch.h"
 #include "src/stopwatch.c"
+#include "src/UARTSetup.c"
 
 /*================================================================*/
 int main(int argc, char *argv[]) {
   char *default_time = "00:00:00";
+  volatile uint32_t systemclock_scaled = 0;
+  volatile uint32_t systemClock = 0;
+
+  // systemClock initialized to 120Mhz
+  systemClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
+                                    SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
+                                   120000000);
 
   // Initialize the interrupt
   SysTick_INIT();
-  INTInit();
+
   // Initialize UART since we need to communicate using the serial terminal
-  // I want to implement the UART interrupt, and simultaneosly have a clock ticking
-  // Depending on the UART input the interrupt will perform different tasks
-  // Functions to implement in the IRS, START, STOP, Reset
+  // I want to implement the UART interrupt, and simultaneosly have a clock
+  // ticking Depending on the UART input the interrupt will perform different
+  // tasks Functions to implement in the IRS, START, STOP, Reset
   UARTConfigure();
   while (1) {
     UARTPrintToTerminal(default_time);
+    UARTReceiveInput(default_time);
   }
   return 0;
 }
