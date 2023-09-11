@@ -40,7 +40,7 @@ void ConfigureUART() {
   UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
 
   // Configures the settings for the UART communication,
-  // baudrate, frequencu, port
+  // baudrate, frequencu, port.
   UARTStdioConfig(0, 115200, 16000000);
 }
 
