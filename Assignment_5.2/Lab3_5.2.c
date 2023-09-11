@@ -18,8 +18,6 @@
 /*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
-#include <sys/types.h>
-#include "inc/stopwatch.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
@@ -28,19 +26,15 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
-#include "utils/uartstdio.c"
-// #include "inc/tm4c129encpdt.h"
+// #include "utils/uartstdio.c"
 #include "inc/UARTSetup.h"
 #include "inc/stopwatch.h"
-#include "src/stopwatch.c"
-#include "src/UARTSetup.c"
-
 /*================================================================*/
 int main(int argc, char *argv[]) {
   char *default_time = "00:00:00";
   volatile uint32_t systemclock_scaled = 0;
   volatile uint32_t systemClock = 0;
-
+  uint32_t userInput = 0;
   // systemClock initialized to 120Mhz
   systemClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
                                     SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
@@ -55,8 +49,20 @@ int main(int argc, char *argv[]) {
   // tasks Functions to implement in the IRS, START, STOP, Reset
   UARTConfigure();
   while (1) {
-    UARTPrintToTerminal(default_time);
     UARTReceiveInput(default_time);
+
+    // If input is correct
+    userInput = UARTCheckInput(default_time);
+    if (userInput == 2) {
+
+      STOPWATCHStop();
+    } else if (userInput == 1) {
+
+      STOPWATCHStart(default_time);
+    } else {
+
+      STOPWATCHReset(default_time);
+    }
+    UARTprintf(default_time);
   }
-  return 0;
 }
