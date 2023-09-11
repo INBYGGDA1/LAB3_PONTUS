@@ -1,10 +1,10 @@
-#ifndef UART_H 
-#define UART_H 
+#ifndef UARTSetup_H
+#define UARTSetup_H
 
 // Function declarations (prototypes)
+#include <stdint.h>
 extern void UARTConfigure();
-extern void UARTPrintToTerminal(char* buf);
-extern void UARTReceiveInput(char* buf);
-
+extern uint32_t UARTCheckInput(char *buf);
+extern void UARTReceiveInput(char *buf);
 
 #endif
