@@ -26,7 +26,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
-// #include "utils/uartstdio.c"
+#include "utils/uartstdio.c"
 #include "inc/UARTSetup.h"
 #include "inc/stopwatch.h"
 /*================================================================*/
@@ -38,16 +38,16 @@ int main(int argc, char *argv[]) {
   // systemClock initialized to 120Mhz
   systemClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
                                     SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
-                                   120000000);
-
-  // Initialize the interrupt
-  SysTick_INIT();
+                                   16000);
+  uint32_t loadValue = systemClock / 1 - 1;
 
   // Initialize UART since we need to communicate using the serial terminal
   // I want to implement the UART interrupt, and simultaneosly have a clock
   // ticking Depending on the UART input the interrupt will perform different
   // tasks Functions to implement in the IRS, START, STOP, Reset
   UARTConfigure();
+  // Initialize the interrupt
+  SysTick_INIT(loadValue);
   while (1) {
     UARTReceiveInput(default_time);
 
@@ -63,6 +63,5 @@ int main(int argc, char *argv[]) {
 
       STOPWATCHReset(default_time);
     }
-    UARTprintf(default_time);
   }
 }

@@ -11,6 +11,7 @@
  */
 #include <stdbool.h>
 #include <stdint.h>
+#include <sys/types.h>
 #include <time.h>
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
@@ -26,13 +27,14 @@ volatile uint32_t seconds = 0; // Variable to maintain elapsed seconds
 /*         Functions to start,stop, and reset the stopwatch       */
 /*================================================================*/
 void STOPWATCHStart(char *userInput) {}
-void STOPWATCHStop() {}
+void STOPWATCHStop(void) {}
 void STOPWATCHReset(char *userInput) {}
 /*================================================================*/
 /*         The stopwatch will count using an IRS                  */
 /*================================================================*/
-void *IntHandler() {
+void *IntHandler(void) {
   // This irs should be called every 1 second and increment the time
+  UARTprintf("\033[2J"); // Clear the screen
   seconds++;
   UARTprintf("time: %d\n", seconds);
   // Clear the interrupt flag
@@ -42,7 +44,7 @@ void *IntHandler() {
 /*================================================================*/
 /*         The stopwatch will count using an IRS                  */
 /*================================================================*/
-void SysTick_INIT() {
+void SysTick_INIT(uint32_t loadValue) {
 
   // Enable the timer which should be used for interrupts
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
@@ -52,17 +54,19 @@ void SysTick_INIT() {
   }
 
   // TIMER0 configured to be periodic
-  TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
+  // TIMER_CFG_A_PERIODIC is used to keep the interrupts reoccuring and not
+  // stopping after first interrupt
+  TimerConfigure(TIMER0_BASE, TIMER_CFG_A_PERIODIC);
 
   // This will interrupt every 1 second.
-  TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet());
+  TimerLoadSet(TIMER0_BASE, TIMER_A, loadValue);
 
   // Enable the timers.
   TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
   TimerEnable(TIMER0_BASE, TIMER_A);
 
   // Register the timer interrupt handler
-  TimerIntRegister(TIMER0_BASE, TIMER_A, IntHandler());
+  TimerIntRegister(TIMER0_BASE, TIMER_A, IntHandler);
 
   // Enable the interrupts
   IntMasterEnable();

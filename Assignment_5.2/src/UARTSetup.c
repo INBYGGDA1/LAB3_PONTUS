@@ -90,6 +90,7 @@ void UARTConfigure() {
   // Configures the settings for the UART communication,
   // baudrate, frequencu, port.
   UARTStdioConfig(0, 115200, 16000000);
+  UARTprintf("HELLO\n");
 }
 
 /*================================================================*/
