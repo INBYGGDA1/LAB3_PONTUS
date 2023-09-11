@@ -4,7 +4,6 @@
 extern void STOPWATCHStart();
 extern void STOPWATCHStop();
 extern void STOPWATCHReset();
-extern void INTInit();
 extern void INTHandler();
 extern void SysTick_INIT();
 
