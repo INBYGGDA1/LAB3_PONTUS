@@ -51,26 +51,22 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 #endif
 /*================================================================*/
 int main(void) {
-  uint32_t systemClock = 0;
-  uint32_t systemClockScaled = 0;
+  char *default_time = "00:00:00";
+  volatile uint32_t systemClock = 0;
+  volatile uint32_t systemClockScaled = 0;
   uint32_t userInput = 0;
   systemClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
                                     SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
                                    16000);
 
-  systemClockScaled = systemClock - 1;
+  systemClockScaled = systemClock / 1 - 1;
   // Initialize UART since we need to communicate using the serial terminal
   // I want to implement the UART interrupt, and simultaneously have a clock
   // ticking Depending on the UART input the interrupt will perform
   // different tasks Functions to implement in the IRS, START, STOP, Reset
   // Initialize the interrupt
   UARTConfigure();
-  UARTprintf("%d\n", systemClockScaled);
   SysTick_INIT(systemClockScaled);
-
-  IntMasterEnable();
-  TimerEnable(TIMER0_BASE, TIMER_A);
-  UARTprintf("INIT\n");
   while (1) {
     // if (UARTPeek(ucChar) > 0) {
 
