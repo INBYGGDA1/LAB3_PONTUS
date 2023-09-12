@@ -17,6 +17,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <string.h>
+#include "../inc/UARTSetup.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
@@ -73,9 +74,13 @@ void UARTConfigure() {
    To read and write to the registers they need to be enabled with
    SysCtlPeripheralEnable */
   SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+  while (!SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOA)) {
+  }
 
   // Enable the UART0 module
   SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+  while (!SysCtlPeripheralReady(SYSCTL_PERIPH_UART0)) {
+  }
 
   // Set the pins for GPIO block A to be receive and transmit
   GPIOPinConfigure(GPIO_PA0_U0RX);
@@ -90,7 +95,6 @@ void UARTConfigure() {
   // Configures the settings for the UART communication,
   // baudrate, frequencu, port.
   UARTStdioConfig(0, 115200, 16000000);
-  UARTprintf("HELLO\n");
 }
 
 /*================================================================*/
@@ -98,6 +102,5 @@ void UARTConfigure() {
 /*================================================================*/
 void UARTReceiveInput(char *buf) {
   // Input is in hh:mm:ss, convert this string and place in the time struct
-  struct tm time_info;
   UARTgets(buf, sizeof(buf));
 }

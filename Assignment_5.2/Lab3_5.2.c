@@ -16,52 +16,82 @@
  */
 
 /*================================================================*/
+/*         Define MACROS to include correct header definitions    */
+/*================================================================*/
+#include <sys/types.h>
+#define UARTSetup_H
+#define STOPWATCH_H
+#define UART_BUFFERED
+
+/*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
+
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/pin_map.h"
-#include "driverlib/pwm.h"
-#include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/timer.h"
+
 #include "utils/uartstdio.h"
 #include "utils/uartstdio.c"
+
 #include "inc/UARTSetup.h"
 #include "inc/stopwatch.h"
+
+#ifdef DEBUG
+void __error__(char *pcFilename, uint32_t ui32Line) {
+  while (1)
+    ;
+}
+#endif
 /*================================================================*/
-int main(int argc, char *argv[]) {
-  char *default_time = "00:00:00";
-  volatile uint32_t systemclock_scaled = 0;
-  volatile uint32_t systemClock = 0;
-  uint32_t userInput = 0;
-  // systemClock initialized to 120Mhz
+int main(void) {
+  // char *default_time = "00:00:00";
+  // unsigned char ucChar;
+  // uint32_t userInput = 0;
+  uint32_t systemClock = 0;
+  uint32_t systemClockScaled = 0;
+  // systemClock initialized to 16kHz
+
   systemClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
                                     SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
                                    16000);
-  uint32_t loadValue = systemClock / 1 - 1;
 
+  systemClockScaled = systemClock - 1;
   // Initialize UART since we need to communicate using the serial terminal
-  // I want to implement the UART interrupt, and simultaneosly have a clock
-  // ticking Depending on the UART input the interrupt will perform different
-  // tasks Functions to implement in the IRS, START, STOP, Reset
-  UARTConfigure();
+  // I want to implement the UART interrupt, and simultaneously have a clock
+  // ticking Depending on the UART input the interrupt will perform
+  // different tasks Functions to implement in the IRS, START, STOP, Reset
   // Initialize the interrupt
-  SysTick_INIT(loadValue);
+  UARTConfigure();
+  UARTprintf("%d\n",systemClockScaled);
+  SysTick_INIT();
+
+  IntMasterEnable();
+  TimerEnable(TIMER0_BASE, TIMER_A);
+  UARTprintf("INIT\n");
   while (1) {
-    UARTReceiveInput(default_time);
+    // if (UARTPeek(ucChar) > 0) {
 
-    // If input is correct
-    userInput = UARTCheckInput(default_time);
-    if (userInput == 2) {
-
-      STOPWATCHStop();
-    } else if (userInput == 1) {
-
-      STOPWATCHStart(default_time);
-    } else {
-
-      STOPWATCHReset(default_time);
-    }
+    // UARTReceiveInput(default_time);
+    //
+    // // If input is correct
+    // userInput = UARTCheckInput(default_time);
+    // if (userInput == 2) {
+    //
+    //   STOPWATCHStop();
+    // } else if (userInput == 1) {
+    //
+    //   STOPWATCHStart(default_time);
+    // } else {
+    //
+    //   STOPWATCHReset(default_time);
+    // }
   }
+  // }
 }
