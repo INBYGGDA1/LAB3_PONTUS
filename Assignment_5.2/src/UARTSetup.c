@@ -28,7 +28,7 @@
 volatile struct tm userInputTime;
 volatile uint32_t default_flag = 0;
 
-uint32_t UARTCheckInput(const char *input) {
+uint32_t UARTCheckInput(char *input) {
   uint32_t hours, minutes, seconds;
   char format[4]; // To store the ":" separators
 

@@ -1,8 +1,9 @@
-#ifdef UARTSetup_H
+#ifndef UARTSetup_H
+#define UARTSetup_H
 
 #include <stdint.h>
-void UARTConfigure();
-uint32_t UARTCheckInput(char *buf);
-void UARTReceiveInput(char *buf);
+extern void UARTConfigure();
+extern uint32_t UARTCheckInput(char *buf);
+extern void UARTReceiveInput(char *buf);
 
 #endif

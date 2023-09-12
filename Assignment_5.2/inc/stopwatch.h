@@ -1,4 +1,5 @@
-#ifdef STOPWATCH_H
+#ifndef STOPWATCH_H
+#define STOPWATCH_H
 
 #include <stdint.h>
 extern void STOPWATCHStart(char *userInput);

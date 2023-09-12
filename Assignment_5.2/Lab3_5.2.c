@@ -18,9 +18,6 @@
 /*================================================================*/
 /*         Define MACROS to include correct header definitions    */
 /*================================================================*/
-#define UARTSetup_H
-#define STOPWATCH_H
-#define UART_BUFFERED
 
 /*================================================================*/
 #include <stdbool.h>
