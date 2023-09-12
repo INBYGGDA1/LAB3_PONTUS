@@ -53,9 +53,8 @@ void IntHandler(void) {
 /*================================================================*/
 /*         The stopwatch will count using an IRS                  */
 /*================================================================*/
-void SysTick_INIT() {
+void SysTick_INIT(uint32_t loadTime) {
 
-  UARTprintf("Entered TIMER_INIT\n");
   // // Do a complete reset of the timer to avoid errors
   // SysCtlPeripheralDisable(SYSCTL_PERIPH_TIMER0);
   // SysCtlPeripheralReset(SYSCTL_PERIPH_TIMER0);
@@ -68,14 +67,17 @@ void SysTick_INIT() {
   // TIMER_CFG_A_PERIODIC is used to keep the interrupts recurring and not
   // stopping after first interrupt
   TimerConfigure(TIMER0_BASE, TIMER_CFG_A_PERIODIC);
-  TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet() - 1);
-
-  // Register the timer interrupt handler
-  TimerIntRegister(TIMER0_BASE, TIMER_A, IntHandler);
+  TimerLoadSet(TIMER0_BASE, TIMER_A, loadTime);
 
   // Enable the timers.
   TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+  TimerEnable(TIMER0_BASE, TIMER_A);
+
+
+  // Register the timer interrupt handler
+  TimerIntRegister(TIMER0_BASE, TIMER_A, &IntHandler);
+
 
   // // Enable the interrupts
-  IntEnable(INT_TIMER0A);
+  IntMasterEnable();
 }

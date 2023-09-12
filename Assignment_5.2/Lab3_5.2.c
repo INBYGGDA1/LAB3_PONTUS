@@ -18,7 +18,6 @@
 /*================================================================*/
 /*         Define MACROS to include correct header definitions    */
 /*================================================================*/
-#include <sys/types.h>
 #define UARTSetup_H
 #define STOPWATCH_H
 #define UART_BUFFERED
@@ -26,6 +25,7 @@
 /*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
@@ -51,13 +51,9 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 #endif
 /*================================================================*/
 int main(void) {
-  // char *default_time = "00:00:00";
-  // unsigned char ucChar;
-  // uint32_t userInput = 0;
   uint32_t systemClock = 0;
   uint32_t systemClockScaled = 0;
-  // systemClock initialized to 16kHz
-
+  uint32_t userInput = 0;
   systemClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
                                     SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
                                    16000);
@@ -69,8 +65,8 @@ int main(void) {
   // different tasks Functions to implement in the IRS, START, STOP, Reset
   // Initialize the interrupt
   UARTConfigure();
-  UARTprintf("%d\n",systemClockScaled);
-  SysTick_INIT();
+  UARTprintf("%d\n", systemClockScaled);
+  SysTick_INIT(systemClockScaled);
 
   IntMasterEnable();
   TimerEnable(TIMER0_BASE, TIMER_A);
@@ -78,20 +74,20 @@ int main(void) {
   while (1) {
     // if (UARTPeek(ucChar) > 0) {
 
-    // UARTReceiveInput(default_time);
-    //
-    // // If input is correct
-    // userInput = UARTCheckInput(default_time);
-    // if (userInput == 2) {
-    //
-    //   STOPWATCHStop();
-    // } else if (userInput == 1) {
-    //
-    //   STOPWATCHStart(default_time);
-    // } else {
-    //
-    //   STOPWATCHReset(default_time);
-    // }
+    UARTReceiveInput(default_time);
+
+    // If input is correct
+    userInput = UARTCheckInput(default_time);
+    if (userInput == 2) {
+
+      STOPWATCHStop();
+    } else if (userInput == 1) {
+
+      STOPWATCHStart(default_time);
+    } else {
+
+      STOPWATCHReset(default_time);
+    }
   }
   // }
 }
