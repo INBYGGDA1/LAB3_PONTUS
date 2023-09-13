@@ -14,57 +14,60 @@
 /*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
-#include <time.h>
 #include <stdio.h>
 #include <string.h>
 #include "../inc/UARTSetup.h"
+#include "driverlib/interrupt.h"
+#include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
+#include "../inc/sharedVariables.h"
+#include "../inc/stopwatch.h"
 
-volatile struct tm userInputTime;
-volatile uint32_t default_flag = 0;
+char inputBuffer[128];
+void UARTIntHandler(void) {
+  uint32_t ui32Status = UARTIntStatus(UART0_BASE, true);
+  UARTIntClear(UART0_BASE, ui32Status);
 
-uint32_t UARTCheckInput(char *input) {
-  uint32_t hours, minutes, seconds;
+  UARTgets(inputBuffer, sizeof(inputBuffer));
+  UARTCheckInput(inputBuffer);
+}
+void UARTCheckInput(char *input) {
   char format[4]; // To store the ":" separators
+  // First check if the UART input is a string
+  int tempHours = 0, tempMinutes = 0, tempSeconds = 0;
+  if (strcmp(input, "start") == 0) {
+    startFlag = 1;
 
-  // Attempt to parse the input string
-  if (sscanf(input, "%2d:%2d:%2d%3s", &hours, &minutes, &seconds, format) !=
-      3) {
-    return 0; // Parsing failed, invalid format
-  }
+  } else if (strcmp(input, "stop") == 0) {
+    stopFlag = 1;
 
-  // Check that hours, minutes, and seconds are within valid ranges
-  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59 || seconds < 0 ||
-      seconds > 59) {
-    return 0; // Components out of range, invalid format
-  } else {
-    // Save the input to the struct
-    userInputTime.tm_min = minutes;
-    userInputTime.tm_hour = hours;
-    userInputTime.tm_sec = seconds;
-  }
-  if (strcmp(input, "stop") == 1) {
-    return 2;
-  } else if (strcmp(input, "start") == 1) {
-    return 1;
+  } else if (strcmp(input, "reset") == 0) {
+    resetFlag = 1;
 
-  } else if (strcmp(input, "reset") == 1) {
-    if (default_flag == 1) {
-      userInputTime.tm_sec = 0;
-      userInputTime.tm_hour = 0;
-      userInputTime.tm_min = 0;
+  } else if (strcmp(input, "pause") == 0) {
+    pauseFlag = 1;
+  }else if (strcmp(input, "resume") == 0) {
+    pauseFlag = 0;
+  
+  } 
+  else if (sscanf(input, "%2d:%2d:%2d%3s", &tempHours, &tempMinutes,
+                    &tempSeconds, format) != 4) {
+    // Check that hours, minutes, and seconds are within valid ranges
+    if (tempHours < 0 || tempHours > 23 || tempMinutes < 0 ||
+        tempMinutes > 59 || tempSeconds < 0 || tempSeconds > 59) {
     } else {
-      // Set reset to user input
+      userHours = tempHours;
+      userMinutes = tempMinutes;
+      userSeconds = tempSeconds;
+      // Update counter
+      convertToSeconds();
     }
-    return 3;
   }
-
-  return 1; // Input is in "hh:mm:ss" format and valid
 }
 /*================================================================*/
 /*            Initialize the UART communication                   */
@@ -95,12 +98,7 @@ void UARTConfigure() {
   // Configures the settings for the UART communication,
   // baudrate, frequencu, port.
   UARTStdioConfig(0, 115200, 16000000);
-}
-
-/*================================================================*/
-/*            Wait for input in the serial terminal               */
-/*================================================================*/
-void UARTReceiveInput(char *buf) {
-  // Input is in hh:mm:ss, convert this string and place in the time struct
-  UARTgets(buf, sizeof(buf));
+  UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
+  UARTIntRegister(UART0_BASE, UARTIntHandler);
+  IntEnable(INT_UART0);
 }

@@ -16,10 +16,6 @@
  */
 
 /*================================================================*/
-/*         Define MACROS to include correct header definitions    */
-/*================================================================*/
-
-/*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
@@ -39,48 +35,36 @@
 
 #include "inc/UARTSetup.h"
 #include "inc/stopwatch.h"
+#include "inc/sharedVariables.h"
 
+/*================================================================*/
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
   while (1)
     ;
 }
 #endif
+
+/*================================================================*/
+/*         Set the initial values for the stopwatch               */
+/*================================================================*/
+volatile uint32_t hours = 0, minutes = 0, seconds = 0;
+volatile uint32_t userHours = 0, userMinutes = 0, userSeconds = 0;
+volatile uint32_t stopwatch_time = 0;
+volatile uint32_t startFlag = 0, stopFlag = 0, resetFlag = 0, countFlag = 0;
+
 /*================================================================*/
 int main(void) {
-  char *default_time = "00:00:00";
-  volatile uint32_t systemClock = 0;
-  volatile uint32_t systemClockScaled = 0;
-  uint32_t userInput = 0;
-  systemClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
-                                    SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
-                                   16000);
-
-  systemClockScaled = systemClock / 1 - 1;
   // Initialize UART since we need to communicate using the serial terminal
   // I want to implement the UART interrupt, and simultaneously have a clock
   // ticking Depending on the UART input the interrupt will perform
   // different tasks Functions to implement in the IRS, START, STOP, Reset
   // Initialize the interrupt
   UARTConfigure();
-  SysTick_INIT(systemClockScaled);
+  SysTick_INIT(SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
+                                   SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
+                                  16000) -
+               1);
   while (1) {
-    // if (UARTPeek(ucChar) > 0) {
-
-    UARTReceiveInput(default_time);
-
-    // If input is correct
-    userInput = UARTCheckInput(default_time);
-    if (userInput == 2) {
-
-      STOPWATCHStop();
-    } else if (userInput == 1) {
-
-      STOPWATCHStart(default_time);
-    } else {
-
-      STOPWATCHReset(default_time);
-    }
   }
-  // }
 }

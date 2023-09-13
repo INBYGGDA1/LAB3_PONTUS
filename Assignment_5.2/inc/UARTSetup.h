@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 extern void UARTConfigure();
-extern uint32_t UARTCheckInput(char *buf);
-extern void UARTReceiveInput(char *buf);
+extern void UARTCheckInput(char *input);
 
 #endif
