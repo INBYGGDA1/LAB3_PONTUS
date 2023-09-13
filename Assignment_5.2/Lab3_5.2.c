@@ -48,9 +48,13 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 /*================================================================*/
 /*         Set the initial values for the stopwatch               */
 /*================================================================*/
+// Values displayed in the terminal
 volatile uint32_t hours = 0, minutes = 0, seconds = 0;
+// Variable to keep track of initial user value
 volatile uint32_t userHours = 0, userMinutes = 0, userSeconds = 0;
+// stopwatch counter
 volatile uint32_t stopwatch_time = 0;
+// Flags to represent the stopwatch action
 volatile uint32_t startFlag = 0, stopFlag = 0, resetFlag = 0, countFlag = 0;
 
 /*================================================================*/
@@ -64,5 +68,6 @@ int main(void) {
                                16000));
   while (1) {
     // The functionality of the stopwatch is handled by the respective ISRs.
+    // This loop is here to prevent the program from exiting
   }
 }
