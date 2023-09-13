@@ -66,6 +66,8 @@ void STOPWATCHReset(void) {
 /*                       The stopwatch IRS                        */
 /*================================================================*/
 void IntHandler(void) {
+  // Clear the interrupt flag to let the timer interrupt again
+  TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
   if (startFlag == 1) {
     STOPWATCHStart();
   }
@@ -75,9 +77,7 @@ void IntHandler(void) {
   if (resetFlag == 1) {
     STOPWATCHReset();
   }
-  if (countFlag == 1) {
-    stopwatch_time++;
-  }
+
   // Clear the screen to prevent scrolling
   UARTprintf("\033[2J");
 
@@ -86,10 +86,11 @@ void IntHandler(void) {
   minutes = (stopwatch_time / 60) % 60;
   hours = (stopwatch_time / 3600) % 24;
 
-  UARTprintf("\rStopwatch time: %02u:%02u:%02u\nInput: ", hours, minutes,
+  UARTprintf("Stopwatch time: %02u:%02u:%02u\nInput: ", hours, minutes,
              seconds);
-  // Clear the interrupt flag to let the timer interrupt again
-  TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+  if (countFlag == 1) {
+    stopwatch_time++;
+  }
 }
 
 /*================================================================*/
