@@ -3,7 +3,8 @@
  * File: stopwatch.c
  * Author: Pontus Svensson
  * Date: 2023-09-11
- * Description: This files handles functionality to start, stop, reset the stopwatch
+ * Description: This files handles functionality to start, stop and reset the
+ * stopwatch
  *
  * License: This code is distributed under the MIT License. visit
  * https://opensource.org/licenses/MIT for more information.
@@ -92,7 +93,7 @@ void IntHandler(void) {
 }
 
 /*================================================================*/
-/*         The stopwatch will count using an IRS                  */
+/*         Initialization of the timer module and IRS             */
 /*================================================================*/
 void TIMERInit(uint32_t loadTime) {
 
@@ -111,7 +112,7 @@ void TIMERInit(uint32_t loadTime) {
   TimerEnable(TIMER0_BASE, TIMER_A);
 
   // Register the timer interrupt handler
-  TimerIntRegister(TIMER0_BASE, TIMER_A, &IntHandler);
+  TimerIntRegister(TIMER0_BASE, TIMER_A, IntHandler);
 
   // // Enable the interrupts
   IntMasterEnable();

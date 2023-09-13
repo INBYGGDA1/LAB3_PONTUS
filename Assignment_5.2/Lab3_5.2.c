@@ -60,9 +60,9 @@ int main(void) {
 
   // Initialize the interrupt and set the clock frequency to 16kHz
   TIMERInit(SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
-                                   SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
-                                  16000) -
-               1);
+                                SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
+                               16000));
   while (1) {
+    // The functionality of the stopwatch is handled by the respective ISRs.
   }
 }

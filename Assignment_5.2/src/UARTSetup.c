@@ -4,6 +4,7 @@
  * Author: Pontus Svensson
  * Date: 2023-09-11
  * Description: This file handles functionality for the UART IRS and configuration. 
+ * 
  *
  * License: This code is distributed under the MIT License. visit
  * https://opensource.org/licenses/MIT for more information.
