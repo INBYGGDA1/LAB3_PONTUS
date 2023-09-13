@@ -79,7 +79,7 @@ void UARTCheckInput(char *input) {
       userHours = tempHours;
       userMinutes = tempMinutes;
       userSeconds = tempSeconds;
-      // Update counter
+      // Update stopwatch counter
       convertToSeconds();
     }
   }
