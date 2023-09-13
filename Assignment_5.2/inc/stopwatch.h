@@ -7,6 +7,6 @@ extern void STOPWATCHStop(void);
 extern void STOPWATCHReset(void);
 extern void convertToSeconds(void);
 extern void INTHandler(void);
-extern void SysTick_INIT(uint32_t loadValue);
+extern void TIMERInit(uint32_t loadValue);
 
 #endif // STOPWATCH_H

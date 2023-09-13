@@ -3,12 +3,14 @@
  * File: stopwatch.c
  * Author: Pontus Svensson
  * Date: 2023-09-11
- * Description: This files handles function to start, stop, reset the stopwatch
+ * Description: This files handles functionality to start, stop, reset the stopwatch
  *
  * License: This code is distributed under the MIT License. visit
  * https://opensource.org/licenses/MIT for more information.
  * ================================================================
  */
+
+/*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
 #include <sys/types.h>
@@ -30,6 +32,7 @@
 void convertToSeconds(void) {
   stopwatch_time = (userHours * 3600) + (userMinutes * 60) + userSeconds;
 }
+
 /*================================================================*/
 /*         Functions to start,stop, and reset the stopwatch       */
 /*================================================================*/
@@ -38,6 +41,7 @@ void STOPWATCHStart(void) {
   startFlag = 0;
 }
 
+/*================================================================*/
 void STOPWATCHStop(void) {
   convertToSeconds();
   countFlag = 0;
@@ -45,6 +49,8 @@ void STOPWATCHStop(void) {
   stopFlag = 0;
   startFlag = 0;
 }
+
+/*================================================================*/
 void STOPWATCHReset(void) {
   // Reset to user defined input
   convertToSeconds();
@@ -56,7 +62,7 @@ void STOPWATCHReset(void) {
 }
 
 /*================================================================*/
-/*              The stopwatch will count using an IRS             */
+/*                       The stopwatch IRS                        */
 /*================================================================*/
 void IntHandler(void) {
   if (startFlag == 1) {
@@ -71,23 +77,24 @@ void IntHandler(void) {
   if (countFlag == 1) {
     stopwatch_time++;
   }
-  // This irs should be called every 1 second and increment the time
-  UARTprintf("\033[2J"); // Clear the screen
+  // Clear the screen to prevent scrolling
+  UARTprintf("\033[2J");
 
+  // Update the clock
   seconds = stopwatch_time % 60;
   minutes = (stopwatch_time / 60) % 60;
   hours = (stopwatch_time / 3600) % 24;
 
   UARTprintf("\rStopwatch time: %02u:%02u:%02u\nInput: ", hours, minutes,
              seconds);
-  // Clear the interrupt flag
+  // Clear the interrupt flag to let the timer interrupt again
   TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 }
 
 /*================================================================*/
 /*         The stopwatch will count using an IRS                  */
 /*================================================================*/
-void SysTick_INIT(uint32_t loadTime) {
+void TIMERInit(uint32_t loadTime) {
 
   // Enable the timer which should be used for interrupts
   SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);

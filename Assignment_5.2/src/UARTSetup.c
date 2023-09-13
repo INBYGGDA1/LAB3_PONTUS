@@ -3,8 +3,7 @@
  * File: UARTSetup.c
  * Author: Pontus Svensson
  * Date: 2023-09-11
- * Description: This file handles functionality for the UART protocol for the
- * stopwatch
+ * Description: This file handles functionality for the UART IRS and configuration. 
  *
  * License: This code is distributed under the MIT License. visit
  * https://opensource.org/licenses/MIT for more information.
@@ -28,19 +27,36 @@
 #include "../inc/sharedVariables.h"
 #include "../inc/stopwatch.h"
 
+/*================================================================*/
 char inputBuffer[128];
+
+/*================================================================*/
+/*              The UART interrupt service routine                */
+/*================================================================*/
 void UARTIntHandler(void) {
+  // Returns the current interrupt status
   uint32_t ui32Status = UARTIntStatus(UART0_BASE, true);
+
+  // Clear the registers to prevent the handler getting called again upon
+  // exiting the function
   UARTIntClear(UART0_BASE, ui32Status);
 
+  // This function processes the UART input string
   UARTgets(inputBuffer, sizeof(inputBuffer));
+
+  // Call to check what the input represents, start, stop, reset, or hh_mm_ss
   UARTCheckInput(inputBuffer);
 }
+
+/*================================================================*/
+/*         Check the string received from UART0                   */
+/*================================================================*/
 void UARTCheckInput(char *input) {
-  char format[4]; // To store the ":" separators
+  // To store the ":" separators
+  char format[4];
   int tempHours = 0, tempMinutes = 0, tempSeconds = 0;
 
-  // First check if the UART input is a string
+  // First check if the UART input is one of the following strings
   if (strcmp(input, "start") == 0) {
     startFlag = 1;
 
@@ -49,11 +65,11 @@ void UARTCheckInput(char *input) {
 
   } else if (strcmp(input, "reset") == 0) {
     resetFlag = 1;
- 
-  } 
+
+  }
   // sscanf will save values divided by : in each variable
   else if (sscanf(input, "%2d:%2d:%2d%3s", &tempHours, &tempMinutes,
-                    &tempSeconds, format) == 3) {
+                  &tempSeconds, format) == 3) {
     // Check that hours, minutes, and seconds are within valid ranges
     if (tempHours < 0 || tempHours > 23 || tempMinutes < 0 ||
         tempMinutes > 59 || tempSeconds < 0 || tempSeconds > 59) {
@@ -67,6 +83,7 @@ void UARTCheckInput(char *input) {
     }
   }
 }
+
 /*================================================================*/
 /*            Initialize the UART communication                   */
 /*================================================================*/
@@ -96,7 +113,13 @@ void UARTConfigure() {
   // Configures the settings for the UART communication,
   // baudrate, frequencu, port.
   UARTStdioConfig(0, 115200, 16000000);
+
+  // Enables interrupts for UART
   UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
+
+  // Enable the global interrupt and set the IRS
   UARTIntRegister(UART0_BASE, UARTIntHandler);
+
+  // Specify UART0 for interrupts in the interrupt controller
   IntEnable(INT_UART0);
 }

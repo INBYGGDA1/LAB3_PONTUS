@@ -59,7 +59,7 @@ int main(void) {
   UARTConfigure();
 
   // Initialize the interrupt and set the clock frequency to 16kHz
-  SysTick_INIT(SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
+  TIMERInit(SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
                                    SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
                                   16000) -
                1);
