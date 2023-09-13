@@ -38,8 +38,9 @@ void UARTIntHandler(void) {
 }
 void UARTCheckInput(char *input) {
   char format[4]; // To store the ":" separators
-  // First check if the UART input is a string
   int tempHours = 0, tempMinutes = 0, tempSeconds = 0;
+
+  // First check if the UART input is a string
   if (strcmp(input, "start") == 0) {
     startFlag = 1;
 
@@ -48,19 +49,16 @@ void UARTCheckInput(char *input) {
 
   } else if (strcmp(input, "reset") == 0) {
     resetFlag = 1;
-
-  } else if (strcmp(input, "pause") == 0) {
-    pauseFlag = 1;
-  }else if (strcmp(input, "resume") == 0) {
-    pauseFlag = 0;
-  
+ 
   } 
+  // sscanf will save values divided by : in each variable
   else if (sscanf(input, "%2d:%2d:%2d%3s", &tempHours, &tempMinutes,
-                    &tempSeconds, format) != 4) {
+                    &tempSeconds, format) == 3) {
     // Check that hours, minutes, and seconds are within valid ranges
     if (tempHours < 0 || tempHours > 23 || tempMinutes < 0 ||
         tempMinutes > 59 || tempSeconds < 0 || tempSeconds > 59) {
     } else {
+      // Set the user defined time
       userHours = tempHours;
       userMinutes = tempMinutes;
       userSeconds = tempSeconds;

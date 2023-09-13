@@ -56,11 +56,9 @@ volatile uint32_t startFlag = 0, stopFlag = 0, resetFlag = 0, countFlag = 0;
 /*================================================================*/
 int main(void) {
   // Initialize UART since we need to communicate using the serial terminal
-  // I want to implement the UART interrupt, and simultaneously have a clock
-  // ticking Depending on the UART input the interrupt will perform
-  // different tasks Functions to implement in the IRS, START, STOP, Reset
-  // Initialize the interrupt
   UARTConfigure();
+
+  // Initialize the interrupt and set the clock frequency to 16kHz
   SysTick_INIT(SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
                                    SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480),
                                   16000) -
