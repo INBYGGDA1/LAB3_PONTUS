@@ -3,8 +3,9 @@
  * File: UARTSetup.c
  * Author: Pontus Svensson
  * Date: 2023-09-11
- * Description: This file handles functionality for the UART IRS and configuration. 
- * 
+ * Description: This file handles functionality for the UART IRS and
+ * configuration.
+ *
  *
  * License: This code is distributed under the MIT License. visit
  * https://opensource.org/licenses/MIT for more information.
@@ -42,11 +43,14 @@ void UARTIntHandler(void) {
   // exiting the function
   UARTIntClear(UART0_BASE, ui32Status);
 
+  // Prevent another interrupt from executing
+  IntMasterDisable();
   // This function processes the UART input string
   UARTgets(inputBuffer, sizeof(inputBuffer));
 
   // Call to check what the input represents, start, stop, reset, or hh_mm_ss
   UARTCheckInput(inputBuffer);
+  IntMasterEnable();
 }
 
 /*================================================================*/
@@ -80,6 +84,7 @@ void UARTCheckInput(char *input) {
       userMinutes = tempMinutes;
       userSeconds = tempSeconds;
       // Update stopwatch counter
+      // To prevent the IRS trying to update the values simultaneosly
       convertToSeconds();
     }
   }

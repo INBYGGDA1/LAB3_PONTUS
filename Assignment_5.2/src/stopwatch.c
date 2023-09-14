@@ -68,6 +68,9 @@ void STOPWATCHReset(void) {
 void IntHandler(void) {
   // Clear the interrupt flag to let the timer interrupt again
   TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
+  // To prevent race condition we disable the interrupts while increasing the
+  // timer. I note that
+  IntMasterDisable();
   if (startFlag == 1) {
     STOPWATCHStart();
   }
@@ -91,6 +94,7 @@ void IntHandler(void) {
   if (countFlag == 1) {
     stopwatch_time++;
   }
+  IntMasterEnable();
 }
 
 /*================================================================*/
