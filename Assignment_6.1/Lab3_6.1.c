@@ -1,9 +1,12 @@
 /*
  * ================================================================
  * File: Lab3_6.1.c
- * Author: Pontus Svensson
+ * Author: Pontus Svensson, Carl Larsson
+ * Email: psn19003@student.mdu.se, cln20001@student.mdu.se
  * Date: 2023-09-11
- * Description:
+ * Description: The program showcases the functionality of using UART with
+ * interrupts instead of polling. Enter a string in the serial terminal and the
+ * program will echo it back.
  *
  * License: This code is distributed under the MIT License. visit
  * https://opensource.org/licenses/MIT for more information.
@@ -13,7 +16,6 @@
 /*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/pin_map.h"
@@ -22,7 +24,7 @@
 #include "utils/uartstdio.h"
 #include "utils/uartstdio.c"
 
-volatile char *inputBuffer[128];
+volatile char inputBuffer[128];
 
 /*================================================================*/
 /*              The UART interrupt service routine                */
@@ -87,7 +89,10 @@ void UARTConfigure() {
 }
 /*================================================================*/
 int main(void) {
+  // Start that uart module and start the UARTinterrupts module
   UARTConfigure();
   while (1) {
+    // Loop to prevent the program from exiting
+    // All functionality is handled by interrupt service routine
   }
 }

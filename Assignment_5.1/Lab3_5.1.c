@@ -1,7 +1,8 @@
 /*
  * ================================================================
  * File: Lab3_5.1.c
- * Author: Pontus Svensson
+ * Author: Pontus Svensson, Carl Larsson
+ * Email: psn19003@student.mdu.se, cln20001@student.mdu.se
  * Date: 2023-09-11
  * Description: Configures TM4C129 to enable and configure UART for
  * communication using a serial terminal

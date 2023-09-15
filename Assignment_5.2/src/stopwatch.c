@@ -1,7 +1,8 @@
 /*
  * ================================================================
  * File: stopwatch.c
- * Author: Pontus Svensson
+ * Author: Pontus Svensson, Carl Larsson
+ * Email: psn19003@student.mdu.se, cln20001@student.mdu.se
  * Date: 2023-09-11
  * Description: This files handles functionality to start, stop and reset the
  * stopwatch
