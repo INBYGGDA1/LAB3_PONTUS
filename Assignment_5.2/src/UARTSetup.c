@@ -18,41 +18,23 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "../inc/UARTSetup.h"
-#include "driverlib/interrupt.h"
+
 #include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
+
+#include "driverlib/interrupt.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
+
 #include "utils/uartstdio.h"
+
 #include "../inc/sharedVariables.h"
 #include "../inc/stopwatch.h"
 
 /*================================================================*/
 char inputBuffer[128];
-
-/*================================================================*/
-/*              The UART interrupt service routine                */
-/*================================================================*/
-void UARTIntHandler(void) {
-  // Returns the current interrupt status
-  uint32_t ui32Status = UARTIntStatus(UART0_BASE, true);
-
-  // Clear the registers to prevent the handler getting called again upon
-  // exiting the function
-  UARTIntClear(UART0_BASE, ui32Status);
-
-  // Prevent another interrupt from executing
-  IntMasterDisable();
-  // This function processes the UART input string
-  UARTgets(inputBuffer, sizeof(inputBuffer));
-
-  // Call to check what the input represents, start, stop, reset, or hh_mm_ss
-  UARTCheckInput(inputBuffer);
-  IntMasterEnable();
-}
 
 /*================================================================*/
 /*         Check the string received from UART0                   */
@@ -84,11 +66,31 @@ void UARTCheckInput(char *input) {
       userHours = tempHours;
       userMinutes = tempMinutes;
       userSeconds = tempSeconds;
+
       // Update stopwatch counter
-      // To prevent the IRS trying to update the values simultaneosly
       convertToSeconds();
     }
   }
+}
+/*================================================================*/
+/*              The UART interrupt service routine                */
+/*================================================================*/
+void UARTIntHandler(void) {
+  // Returns the current interrupt status
+  uint32_t ui32Status = UARTIntStatus(UART0_BASE, true);
+
+  // Clear the registers to prevent the handler getting called again upon
+  // exiting the function
+  UARTIntClear(UART0_BASE, ui32Status);
+
+  // Prevent another interrupt from executing
+  IntMasterDisable();
+  // This function processes the UART input string
+  UARTgets(inputBuffer, sizeof(inputBuffer));
+
+  // Call to check what the input represents, start, stop, reset, or hh_mm_ss
+  UARTCheckInput(inputBuffer);
+  IntMasterEnable();
 }
 
 /*================================================================*/

@@ -15,17 +15,15 @@
 /*================================================================*/
 #include <stdbool.h>
 #include <stdint.h>
-#include <sys/types.h>
+
 #include "inc/hw_memmap.h"
-#include "inc/hw_ints.h"
+
 #include "driverlib/timer.h"
 #include "driverlib/interrupt.h"
-#include "driverlib/gpio.h"
-#include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
-#include "driverlib/uart.h"
+
 #include "utils/uartstdio.h"
-#include "../inc/stopwatch.h"
+
 #include "../inc/sharedVariables.h"
 
 /*================================================================*/
@@ -64,6 +62,15 @@ void STOPWATCHReset(void) {
 }
 
 /*================================================================*/
+/*                Function to update the stopwatch                */
+/*================================================================*/
+void STOPWATCHUpdate() {
+  // Update the clock
+  seconds = stopwatch_time % 60;
+  minutes = (stopwatch_time / 60) % 60;
+  hours = (stopwatch_time / 3600) % 24;
+}
+/*================================================================*/
 /*                       The stopwatch IRS                        */
 /*================================================================*/
 void IntHandler(void) {
@@ -84,14 +91,10 @@ void IntHandler(void) {
 
   // Clear the screen to prevent scrolling
   UARTprintf("\033[2J");
-
-  // Update the clock
-  seconds = stopwatch_time % 60;
-  minutes = (stopwatch_time / 60) % 60;
-  hours = (stopwatch_time / 3600) % 24;
-
+  STOPWATCHUpdate();
   UARTprintf("Stopwatch time: %02u:%02u:%02u\nInput: ", hours, minutes,
              seconds);
+
   if (countFlag == 1) {
     stopwatch_time++;
   }
@@ -120,6 +123,6 @@ void TIMERInit(uint32_t loadTime) {
   // Register the timer interrupt handler
   TimerIntRegister(TIMER0_BASE, TIMER_A, IntHandler);
 
-  // // Enable the interrupts
+  // Enable the interrupts
   IntMasterEnable();
 }

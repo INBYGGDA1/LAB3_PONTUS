@@ -1,9 +1,10 @@
 /*
  * ================================================================
  * File: Lab3_6.1.c
- * Author: Pontus Svensson, Carl Larsson
- * Email: psn19003@student.mdu.se, cln20001@student.mdu.se
+ * Author: Pontus Svensson 
+ * Email: psn19003@student.mdu.se 
  * Date: 2023-09-11
+ *
  * Description: The program showcases the functionality of using UART with
  * interrupts instead of polling. Enter a string in the serial terminal and the
  * program will echo it back.
@@ -71,11 +72,11 @@ void UARTConfigure() {
   // GPIOPinTypeUART configures the pins to work in the correct configuration
   GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
-  // Specifies the baudclock source for the UART
+  // Specifies the baud clock source for the UART
   UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
 
   // Configures the settings for the UART communication,
-  // baudrate, frequencu, port.
+  // baud rate, frequency, port.
   UARTStdioConfig(0, 115200, 16000000);
 
   // Enables interrupts for UART
